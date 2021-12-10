@@ -12,11 +12,17 @@ import { LIMIT_COUNT, EMPTY_STRING } from "spacex/constants";
 import Wrapper from "components/Wrapper";
 import AgTable from "components/Table";
 import { IColHeader } from "components/Table/types";
+import RocketDetailsModal from "components/RocketDetails";
 
 const Home: FC = () => {
   const { state, dispatch } = useSpaceX();
   const { loading, launches, rockets, rocketLoading } = state;
   const [activeRocketId, setActiveRocketId] = useState<string>(EMPTY_STRING);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+
+  const handleCloseModal = useCallback(() => {
+    setOpenModal(false);
+  }, []);
 
   const getActiveRocket = useCallback(
     () => rockets.get(activeRocketId),
@@ -43,12 +49,14 @@ const Home: FC = () => {
 
         dispatch(SetLuanches(sortedLaunches.slice(0, limitCount)));
       } catch (err: any) {
+        setOpenModal(false);
       } finally {
         dispatch(SetLoading(false));
       }
     };
 
     fetchData();
+    // eslint-disable-next-line
   }, []);
 
   const detailsRender = (param: any) => (
@@ -59,6 +67,7 @@ const Home: FC = () => {
         setActiveRocketId(rocketId);
         if (rocketId !== EMPTY_STRING) {
           fetchRocketData(rocketId);
+          setOpenModal(true);
         }
       }}
       data-testid={`details-button-${param.rowIndex}`}
@@ -67,7 +76,7 @@ const Home: FC = () => {
     </Button>
   );
 
-  const fetchRocketData = useCallback(async (rocketId: string) => {
+  const fetchRocketData = async (rocketId: string) => {
     try {
       if (!rockets.has(rocketId)) {
         dispatch(SetRocketLoading(true));
@@ -78,7 +87,7 @@ const Home: FC = () => {
     } finally {
       dispatch(SetRocketLoading(false));
     }
-  }, []);
+  };
 
   const colDefs: IColHeader[] = [
     {
@@ -102,6 +111,14 @@ const Home: FC = () => {
           <>Loading...</>
         ) : (
           <AgTable rowData={launches} colDefs={colDefs} />
+        )}
+        {openModal && (
+          <RocketDetailsModal
+            isOpen={openModal}
+            rocket={getActiveRocket()}
+            loading={rocketLoading}
+            onClose={handleCloseModal}
+          />
         )}
       </Wrapper>
     </Container>
