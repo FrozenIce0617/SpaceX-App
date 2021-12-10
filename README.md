@@ -30,7 +30,7 @@ This is the simple application that lists information about SpaceX rocket launch
 ## How to use
 1. Clone the repo in your local
     ``` 
-    https://github.com/FrozenIce0617/SpaceX-App.git
+    git clone https://github.com/FrozenIce0617/SpaceX-App.git
     ```
 
 2. This project is bootstrapped by `create-react-app`
@@ -43,7 +43,7 @@ This is the simple application that lists information about SpaceX rocket launch
     yarn start
     ```
 
-3. Run to uni test
+3. Run to unit test
     ```
     yarn test
     ```
