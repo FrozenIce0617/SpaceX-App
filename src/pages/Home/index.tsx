@@ -97,7 +97,7 @@ const Home: FC = () => {
       floatingFilter: true,
     },
     { field: "date", sortable: true },
-    { field: "launchpad" },
+    { field: "launchpad", sortable: true },
     { field: "upcoming" },
     { field: "capsule" },
     { field: "details", cellRendererFramework: detailsRender },
