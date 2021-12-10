@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useEffect } from "react";
-import { Container, Button } from "@mui/material";
+import { Container, Button, CircularProgress } from "@mui/material";
 import { useSpaceX } from "spacex/context";
 import {
   AddRocket,
@@ -108,7 +108,7 @@ const Home: FC = () => {
       <Wrapper>
         <h1>SpaceX App</h1>
         {loading ? (
-          <>Loading...</>
+          <CircularProgress data-testid="loading-spinner" />
         ) : (
           <AgTable rowData={launches} colDefs={colDefs} />
         )}

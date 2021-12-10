@@ -59,9 +59,9 @@ const RocketDetailsModal = ({
       <Wrapper>
         <Box sx={style}>
           {loading ? (
-            <CircularProgress />
+            <CircularProgress aria-label="rocket loading spinner"/>
           ) : (
-            <Paper key={rocket?.name} elevation={0} className="rocket">
+            <Paper key={rocket?.name} elevation={0} className="rocket" aria-label="rocket details">
               <Typography variant="h4">{rocket?.name}</Typography>
               <img
                 className="rocket-img"
