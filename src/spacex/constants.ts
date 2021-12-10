@@ -2,6 +2,7 @@ import { Store, ISpaceXContext, IRocket } from "spacex/types";
 
 export const LIMIT_COUNT: number = 50;
 export const SPACEX_BASE_URL = "https://api.spacexdata.com/v4";
+export const EMPTY_STRING = '';
 
 export const initialSpaceXContext: ISpaceXContext = {
   launches: [],

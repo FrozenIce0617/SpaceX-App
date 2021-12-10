@@ -1,14 +1,27 @@
-import React, { FC, useCallback, useEffect } from "react";
-import { Container } from "@mui/material";
+import React, { FC, useState, useCallback, useEffect } from "react";
+import { Container, Button } from "@mui/material";
 import { useSpaceX } from "spacex/context";
-import { SetLoading, SetLuanches } from "spacex/types";
-import { fetchPreviousLaunches } from "spacex/network";
-import { LIMIT_COUNT } from "spacex/constants";
+import {
+  AddRocket,
+  SetLoading,
+  SetLuanches,
+  SetRocketLoading,
+} from "spacex/types";
+import { fetchPreviousLaunches, fetchRocket } from "spacex/network";
+import { LIMIT_COUNT, EMPTY_STRING } from "spacex/constants";
 import Wrapper from "components/Wrapper";
+import AgTable from "components/Table";
+import { IColHeader } from "components/Table/types";
 
 const Home: FC = () => {
   const { state, dispatch } = useSpaceX();
-  const { loading, launches, rockets } = state;
+  const { loading, launches, rockets, rocketLoading } = state;
+  const [activeRocketId, setActiveRocketId] = useState<string>(EMPTY_STRING);
+
+  const getActiveRocket = useCallback(
+    () => rockets.get(activeRocketId),
+    [rockets, activeRocketId]
+  );
 
   // loading launches at first rendering
   useEffect(() => {
@@ -38,17 +51,57 @@ const Home: FC = () => {
     fetchData();
   }, []);
 
+  const detailsRender = (param: any) => (
+    <Button
+      onClick={() => {
+        const rowIndex = param.rowIndex;
+        const rocketId = launches[rowIndex]?.rocket;
+        setActiveRocketId(rocketId);
+        if (rocketId !== EMPTY_STRING) {
+          fetchRocketData(rocketId);
+        }
+      }}
+      data-testid={`details-button-${param.rowIndex}`}
+    >
+      View Rocket Details
+    </Button>
+  );
+
+  const fetchRocketData = useCallback(async (rocketId: string) => {
+    try {
+      if (!rockets.has(rocketId)) {
+        dispatch(SetRocketLoading(true));
+        const rocket = await fetchRocket(rocketId);
+        dispatch(AddRocket(rocket));
+      }
+    } catch (err: any) {
+    } finally {
+      dispatch(SetRocketLoading(false));
+    }
+  }, []);
+
+  const colDefs: IColHeader[] = [
+    {
+      field: "name",
+      sortable: true,
+      filter: "agTextColumnFilter",
+      floatingFilter: true,
+    },
+    { field: "date", sortable: true },
+    { field: "launchpad" },
+    { field: "upcoming" },
+    { field: "capsule" },
+    { field: "details", cellRendererFramework: detailsRender },
+  ];
+
   return (
     <Container maxWidth="lg" data-testid="launch-table-container">
       <Wrapper>
+        <h1>SpaceX App</h1>
         {loading ? (
           <>Loading...</>
         ) : (
-          <>
-            {launches.map((launch) => (
-              <>{launch.name}</>
-            ))}
-          </>
+          <AgTable rowData={launches} colDefs={colDefs} />
         )}
       </Wrapper>
     </Container>
